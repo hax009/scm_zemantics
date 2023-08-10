@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:Xuhaoran1022$@localhost/new_schema' 
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password[@localhost:3306/main'
 db = SQLAlchemy(app)
 
 class User(db.Model):
