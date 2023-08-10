@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password[@localhost:3306/main'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost:3306/mydb'
 db = SQLAlchemy(app)
 
 class User(db.Model):
@@ -19,22 +19,25 @@ class User(db.Model):
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_csv():
-    if request.method == 'POST':
-        if 'csv_file' not in request.files:
-            return 'No file part'
-        file = request.files['csv_file']
+    if request.method == 'GET':
+        return render_template('upload.html')  # Create an HTML form for file upload
 
-        if file.filename == '':
-            return 'No selected file'
+    if 'csv_file' not in request.files:
+        return 'No file part'
+    file = request.files['csv_file']
 
-        if file:
-            csv_file = TextIOWrapper(file.stream, encoding='utf-8')
-            csv_reader = csv.reader(csv_file)
+    if file.filename == '':
+        return 'No selected file'
 
-            for row in csv_reader:
-                new_user = User(username=row[0], email=row[1])
-                db.session.add(new_user)
-            db.session.commit()
-            return 'CSV data inserted into database'
+    file.save("temp.csv")
+    with open("temp.csv") as csvfile:
+        csv_reader = csv.reader(csvfile)
+        # remove header
+        next(csv_reader)
 
-    return render_template('upload.html')  # Create an HTML form for file upload
+        for row in csv_reader:
+            new_user = User(username=row[0], email=row[1])
+            db.session.add(new_user)
+        db.session.commit()
+    return 'CSV data inserted into database'
+
