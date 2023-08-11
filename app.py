@@ -4,10 +4,10 @@ import csv
 import os
 from flask_sqlalchemy import SQLAlchemy
 
-
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost:3306/mydb'
 db = SQLAlchemy(app)
+DB_last_update = datetime.now()
 
 class Shipment(db.Model):
     sku = db.Column(db.Integer, primary_key=True)
@@ -25,6 +25,7 @@ class Shipment(db.Model):
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_csv():
+    global DB_last_update
     if request.method == 'GET':
         return render_template('upload.html')  # Create an HTML form for file upload
 
@@ -45,6 +46,11 @@ def upload_csv():
             columns[header.lower()] = i
 
         for row in csv_reader:
+            # skip old records
+            if "timestamp" in columns and \
+                datetime.strptime(row[columns["timestamp"]], '%Y-%m-%d %H:%M:%S') < DB_last_update:
+                print("old record detected, skipping")
+                continue
             new_record = Shipment(
                 sku = row[columns["sku"]],
                 quantity = row[columns["number of products sold"]],
@@ -58,6 +64,7 @@ def upload_csv():
             )
             db.session.add(new_record)
         db.session.commit()
+        DB_last_update = datetime.now()
 
     os.remove("temp.csv")
     return 'CSV data inserted into database'
