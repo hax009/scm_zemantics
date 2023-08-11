@@ -1,6 +1,7 @@
 from datetime import datetime
 from flask import Flask, request, render_template
 import csv
+import os
 from flask_sqlalchemy import SQLAlchemy
 
 
@@ -75,5 +76,7 @@ def upload_csv():
             )
             db.session.add(new_record)
         db.session.commit()
+
+    os.remove("temp.csv")
     return 'CSV data inserted into database'
 
