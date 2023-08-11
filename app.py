@@ -39,40 +39,22 @@ def upload_csv():
     with open("temp.csv") as csvfile:
         csv_reader = csv.reader(csvfile)
         # map header to row
-        sku = quantity = shipping_time = carrier = \
-            shipping_cost = location = inspection = transport_mode = route = -1
         headers = next(csv_reader)
+        columns = dict()
         for header, i in zip(headers, range(len(headers))):
-            if header.lower() == "sku":
-                sku = i
-            elif header.lower() == "number of products sold":
-                quantity = i
-            elif header.lower() == "shipping times":
-                shipping_time = i
-            elif header.lower() == "shipping carriers":
-                carrier = i
-            elif header.lower() == "shipping costs":
-                shipping_cost = i
-            elif header.lower() == "location":
-                location = i
-            elif header.lower() == "inspection results":
-                inspection = i
-            elif header.lower() == "transportation modes":
-                transport_mode = i
-            elif header.lower() == "routes":
-                route = i
+            columns[header.lower()] = i
 
         for row in csv_reader:
             new_record = Shipment(
-                sku = row[sku],
-                quantity = row[quantity],
-                shippingtime = row[shipping_time],
-                carrier = row[carrier],
-                shippingcost = row[shipping_cost],
-                location = row[location],
-                inspection = row[inspection],
-                transportmode = row[transport_mode],
-                route = row[route]
+                sku = row[columns["sku"]],
+                quantity = row[columns["number of products sold"]],
+                shippingtime = row[columns["shipping times"]],
+                carrier = row[columns["shipping carriers"]],
+                shippingcost = row[columns["shipping costs"]],
+                location = row[columns["location"]],
+                inspection = row[columns["inspection results"]],
+                transportmode = row[columns["transportation modes"]],
+                route = row[columns["routes"]]
             )
             db.session.add(new_record)
         db.session.commit()
