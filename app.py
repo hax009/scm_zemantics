@@ -2,7 +2,10 @@ from datetime import datetime
 from flask import Flask, request, render_template
 import csv
 import os
+from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
+import torch
+from SimpleNeuralNet import NeuralNetwork
 
 
 app = Flask(__name__)
@@ -13,6 +16,11 @@ app.config[
 ] = "mysql+pymysql://root:O`,+CT{>E7KqgaQ[@localhost:3306/scm_project"
 db = SQLAlchemy(app)
 DB_last_update = datetime.now()
+
+
+model = NeuralNetwork(5527, 128)
+model.load_state_dict(torch.load("model128.pth"))
+model.eval()
 
 
 class Shipment(db.Model):
@@ -172,3 +180,23 @@ def upload_csv():
 
     os.remove("temp.csv")
     return "CSV data inserted into database"
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    try:
+        data = request.json  # Get data from JSON request
+        # Preprocess data if needed
+
+        # Perform inference
+        with torch.no_grad():
+            inputs = torch.Tensor(data['input_data'])  # Adjust this according to your input format
+            outputs = model(inputs)
+            # Post-process outputs if needed
+
+        return jsonify({'predictions': outputs.tolist()})
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
+if __name__ == '__main__':
+    app.run(debug=True)
