@@ -8,12 +8,16 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 # 'mysql+pymysql://root:password@localhost:3306/yourdatabasename'
-app.config['SQLALCHEMY_DATABASE_URI'] = ''
+app.config[
+    "SQLALCHEMY_DATABASE_URI"
+] = "mysql+pymysql://root:O`,+CT{>E7KqgaQ[@localhost:3306/scm_project"
 db = SQLAlchemy(app)
 DB_last_update = datetime.now()
 
+
 class Shipment(db.Model):
-    Order_Id = db.Column(db.Integer,primary_key = True)
+    Shipment_Id = db.Column(db.Integer, primary_key=True)
+    Order_Id = db.Column(db.Integer)
     Transaction_type = db.Column(db.String(255))
     Days_for_shipping_real = db.Column(db.Integer)
     Days_for_shipment_scheduled = db.Column(db.Integer)
@@ -66,22 +70,22 @@ class Shipment(db.Model):
     Shipping_date = db.Column(db.DateTime)
     Shipping_Mode = db.Column(db.String(255))
 
-
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f"<User {self.username}>"
 
-@app.route('/upload', methods=['GET', 'POST'])
+
+@app.route("/upload", methods=["GET", "POST"])
 def upload_csv():
     global DB_last_update
-    if request.method == 'GET':
-        return render_template('upload.html')  # Create an HTML form for file upload
+    if request.method == "GET":
+        return render_template("upload.html")  # Create an HTML form for file upload
 
-    if 'csv_file' not in request.files:
-        return 'No file part'
-    file = request.files['csv_file']
+    if "csv_file" not in request.files:
+        return "No file part"
+    file = request.files["csv_file"]
 
-    if file.filename == '':
-        return 'No selected file'
+    if file.filename == "":
+        return "No selected file"
 
     file.save("temp.csv")
     with open("temp.csv") as csvfile:
@@ -90,18 +94,23 @@ def upload_csv():
         headers = next(csv_reader)
         columns = dict()
         for header, i in zip(headers, range(len(headers))):
-            columns[header.lower()] = i
+            columns[header] = i
 
         for row in csv_reader:
             # skip old records
-            if "timestamp" in columns and \
-                datetime.strptime(row[columns["timestamp"]], '%Y-%m-%d %H:%M:%S') < DB_last_update:
+            if (
+                "timestamp" in columns
+                and datetime.strptime(row[columns["timestamp"]], "%Y-%m-%d %H:%M:%S")
+                < DB_last_update
+            ):
                 print("old record detected, skipping")
                 continue
             new_record = Shipment(
                 Transaction_type=row[columns["Type"]],
                 Days_for_shipping_real=row[columns["Days for shipping (real)"]],
-                Days_for_shipment_scheduled=row[columns["Days for shipment (scheduled)"]],
+                Days_for_shipment_scheduled=row[
+                    columns["Days for shipment (scheduled)"]
+                ],
                 Benefit_per_order=row[columns["Benefit per order"]],
                 Sales_per_customer=row[columns["Sales per customer"]],
                 Delivery_Status=row[columns["Delivery Status"]],
@@ -127,7 +136,9 @@ def upload_csv():
                 Order_City=row[columns["Order City"]],
                 Order_Country=row[columns["Order Country"]],
                 Order_Customer_Id=row[columns["Order Customer Id"]],
-                Order_date=row[columns["order date (DateOrders)"]],
+                Order_date=datetime.strptime(
+                    row[columns["order date (DateOrders)"]], "%m/%d/%Y %H:%M"
+                ),
                 Order_Id=row[columns["Order Id"]],
                 Order_Item_Cardprod_Id=row[columns["Order Item Cardprod Id"]],
                 Order_Item_Discount=row[columns["Order Item Discount"]],
@@ -149,8 +160,10 @@ def upload_csv():
                 Product_Name=row[columns["Product Name"]],
                 Product_Price=row[columns["Product Price"]],
                 Product_Status=row[columns["Product Status"]],
-                Shipping_date=row[columns["Shipping date (DateOrders)"]],
-                Shipping_Mode=row[columns["Shipping Mode"]]
+                Shipping_date=datetime.strptime(
+                    row[columns["shipping date (DateOrders)"]], "%m/%d/%Y %H:%M"
+                ),
+                Shipping_Mode=row[columns["Shipping Mode"]],
             )
 
             db.session.add(new_record)
@@ -158,5 +171,4 @@ def upload_csv():
         DB_last_update = datetime.now()
 
     os.remove("temp.csv")
-    return 'CSV data inserted into database'
-
+    return "CSV data inserted into database"
