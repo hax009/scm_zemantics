@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Plan Prediction</title>
+    <style>
+        body{
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        .input-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .input-container label {
+            font-weight: bold;
+            flex: 1;
+        }
+        .input-container input {
+            flex: 2;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .submit-button {
+            margin-top: 10px;
+        }
+        .warning-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Supply Chain Information</h1>
+    <strong>
+        PlaceHolder
+    </strong>
+    {% if warning_message != "" %}
+    <p class="warning-message">{{ warning_message }}</p>
+    {% endif %}
+    <div><br></div>
+    
+    <form action="/predict" method="post">
+        <div class="input-container">
+            <label for="days_shipping">Days for Shipping (Real):</label>
+            <input type="number" id="days_shipping" name="days_shipping" required>
+        </div>
+
+        <div class="input-container">
+            <label for="category_id">Category ID:</label>
+            <input type="number" id="category_id" name="category_id" required>
+        </div>
+
+        <div class="input-container">
+            <label for="customer_city">Customer City:</label>
+            <input type="text" id="customer_city" name="customer_city" required>
+        </div>
+
+        <div class="input-container">
+            <label for="customer_country">Customer Country:</label>
+            <input type="text" id="customer_country" name="customer_country" required>
+        </div>
+
+        <div class="input-container">
+            <label for="customer_state">Customer State:</label>
+            <input type="text" id="customer_state" name="customer_state" required>
+        </div>
+
+        <div class="input-container">
+            <label for="market">Market:</label>
+            <input type="text" id="market" name="market" required>
+        </div>
+
+        <div class="input-container">
+            <label for="order_city">Order City:</label>
+            <input type="text" id="order_city" name="order_city" required>
+        </div>
+
+        <div class="input-container">
+            <label for="order_country">Order Country:</label>
+            <input type="text" id="order_country" name="order_country" required>
+        </div>
+
+        <div class="input-container">
+            <label for="order_region">Order Region:</label>
+            <input type="text" id="order_region" name="order_region" required>
+        </div>
+
+        <div class="input-container">
+            <label for="order_state">Order State:</label>
+            <input type="text" id="order_state" name="order_state" required>
+        </div>
+
+        <div class="input-container">
+            <label for="shipping_mode">Shipping Mode:</label>
+            <input type="text" id="shipping_mode" name="shipping_mode" required>
+        </div>
+
+        <div class="input-container">
+            <label for="order_item_quantity">Order Item Quantity:</label>
+            <input type="number" id="order_item_quantity" name="order_item_quantity" required>
+        </div>
+
+        <div class="submit-button">
+            <input type="submit" value="Predict">
+        </div>
+        <div><a href="/">Go to Home Page</a></div>
+    </form>
+    <h2>{{text}}</h2>
+</body>
+</html>

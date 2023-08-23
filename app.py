@@ -181,22 +181,48 @@ def upload_csv():
     os.remove("temp.csv")
     return "CSV data inserted into database"
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=["GET", "POST"])
 def predict():
-    try:
-        data = request.json  # Get data from JSON request
-        # Preprocess data if needed
+    if request.method == "POST":
+        # read user inputs
+        days_shipping = int(request.form['days_shipping'])
+        category_id = int(request.form['category_id'])
+        customer_city = request.form['customer_city']
+        customer_country = request.form['customer_country']
+        customer_state = request.form['customer_state']
+        market = request.form['market']
+        order_city = request.form['order_city']
+        order_country = request.form['order_country']
+        order_region = request.form['order_region']
+        order_state = request.form['order_state']
+        shipping_mode = request.form['shipping_mode']
+        order_item_quantity = int(request.form['order_item_quantity'])
 
-        # Perform inference
-        with torch.no_grad():
-            inputs = torch.Tensor(data['input_data'])  # Adjust this according to your input format
-            outputs = model(inputs)
-            # Post-process outputs if needed
+        #TODO: check missing values
 
-        return jsonify({'predictions': outputs.tolist()})
+        #TODO: load saved model, feed inputs and return back predictions
+    return render_template("predict.html")
 
-    except Exception as e:
-        return jsonify({'error': str(e)})
+
+    # try:
+    #     data = request.json  # Get data from JSON request
+    #     # Preprocess data if needed
+
+    #     # Perform inference
+    #     with torch.no_grad():
+    #         inputs = torch.Tensor(data['input_data'])  # Adjust this according to your input format
+    #         outputs = model(inputs)
+    #         # Post-process outputs if needed
+
+    #     return jsonify({'predictions': outputs.tolist()})
+
+    # except Exception as e:
+    #     return jsonify({'error': str(e)})
+
+@app.route('/', methods=["GET", "POST"])
+def home():
+    return render_template("home.html")
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
