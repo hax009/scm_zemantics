@@ -203,6 +203,7 @@ def predict():
         #TODO: check missing values
 
         #TODO: load saved model, feed inputs and return back predictions
+        # note: model loaded above already, we don't want to reload the model on every query
     return render_template("predict.html")
 
 
