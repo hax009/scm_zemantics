@@ -6,6 +6,7 @@ from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 import torch
 from SimpleNeuralNet import NeuralNetwork
+import joblib
 
 
 app = Flask(__name__)
@@ -18,9 +19,10 @@ db = SQLAlchemy(app)
 DB_last_update = datetime.now()
 
 
-model = NeuralNetwork(5527, 128)
-model.load_state_dict(torch.load("model128.pth"))
+model = NeuralNetwork(902, 64)
+model.load_state_dict(torch.load("days_model.pth"))
 model.eval()
+scaler = joblib.load("days_pred_scaler.pkl")
 
 
 class Shipment(db.Model):
@@ -213,6 +215,7 @@ def predict():
     #         inputs = torch.Tensor(data['input_data'])  # Adjust this according to your input format
     #         outputs = model(inputs)
     #         # Post-process outputs if needed
+    #         outputs = scaler.inverse_transform(outputs.numpy().reshape(-1,1))
 
     #     return jsonify({'predictions': outputs.tolist()})
 
